@@ -39,6 +39,7 @@ public class GameManager : MonoBehaviour
         if (_inputController.PauseGameInput())
         {
             PauseGame();
+            Time.timeScale = 0f;
         }
     }
 
