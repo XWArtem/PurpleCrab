@@ -8,7 +8,6 @@ public class StatsPanelText : MonoBehaviour
     [SerializeField] private TextMeshProUGUI _moveSpeedLimit;
     [SerializeField] private TextMeshProUGUI _jumpForceLimit;
 
-
     private void Start()
     {
         SetTheString();
@@ -18,8 +17,8 @@ public class StatsPanelText : MonoBehaviour
 
     public void SetTheString()
     {
-        StatsText.text = "Speed:  " + GameManager.instance.CharacterMoveSpeed + "/20"
-            + "<br>Jump force:  " + GameManager.instance.CharacterJumpForce + "/20";
+        StatsText.text = "Speed:  " + GameManager.Instance.CharacterMoveSpeed + "/20"
+            + "<br>Jump force:  " + GameManager.Instance.CharacterJumpForce + "/20";
             //+ "<br>Health:"
             //+ "<br>Weapon:"
             //+ "<br>Special ability:";
@@ -35,11 +34,11 @@ public class StatsPanelText : MonoBehaviour
     public void InformAboutMoveSpeedLimit(int MoveSpeedLimit)
     {
         _moveSpeedLimit.enabled = true;
-        Invoke("DisableInformationOfSpeedLimit", 2f);
+        Invoke(nameof(DisableInformationOfSpeedLimit), 2f);
     }
     public void InformAboutJumpForceLimit(int JumpForceLimit)
     {
         _jumpForceLimit.enabled = true;
-        Invoke("DisableInformationOfJumpForce", 2f);
+        Invoke(nameof(DisableInformationOfJumpForce), 2f);
     }
 }

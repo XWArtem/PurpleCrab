@@ -1,11 +1,15 @@
 using UnityEngine;
-using System.Collections;
 
 public class Destroyabletile : MonoBehaviour
 {
-    [SerializeField] private float _timeToFall = 0.1f;
-    [SerializeField] private Rigidbody2D rb;
-    [SerializeField] private bool alreadyFellDown;
+    [SerializeField] 
+    private float _timeToFall = 0.1f;
+
+    [SerializeField] 
+    private Rigidbody2D rb;
+
+    [SerializeField] 
+    private bool alreadyFellDown;
 
     private void Start()
     {
@@ -25,11 +29,4 @@ public class Destroyabletile : MonoBehaviour
         rb.bodyType = RigidbodyType2D.Dynamic;
         alreadyFellDown = true;
     }
-
-    //IEnumerator Fall()
-    //{
-    //    while (true)
-    //    {
-    //        rb.bodyType = RigidbodyType2D.Dynamic;        }
-    //}
 }

@@ -17,16 +17,17 @@ public class MainMenu : MonoBehaviour
         {
             _settingsPanel = GameObject.Find("SettingsPanel");
         }
-        //_settingsPanel.enabled = false;
         _settingsPanel.SetActive(false);
     }
-    public void LoadCurrentLevel()
+
+    // used by PLAY button in the main menu
+    public void LoadLastOpenLevel()
     {
-        GameManager.instance.LoadCurrentLevel();
+        GameManager.Instance.LoadLastOpenLevel();
     }
     public void SelectLevel()
     {
-        GameManager.instance.SelectLevel();
+        GameManager.Instance.SelectLevel();
     }
     public void OnApplicationQuit()
     {
@@ -34,32 +35,32 @@ public class MainMenu : MonoBehaviour
     }
     public void CharacterMoveSpeedUp()
     {
-        GameManager.instance.CharacterMoveSpeedUp();
+        GameManager.Instance.CharacterMoveSpeedUp();
         _statsPanelText.SetTheString();
         _crystalsAmountText.SetTheString();
     }
     public void CharacterJumpForceUp()
     {
-        GameManager.instance.CharacterJumpForceUp();
+        GameManager.Instance.CharacterJumpForceUp();
         _statsPanelText.SetTheString();
         _crystalsAmountText.SetTheString();
     }
     public void CharacterMoveSpeedDown()
     {
-        GameManager.instance.CharacterMoveSpeedDown();
+        GameManager.Instance.CharacterMoveSpeedDown();
         _statsPanelText.SetTheString();
         _crystalsAmountText.SetTheString();
     }
     public void CharacterJumpForceDown()
     {
-        GameManager.instance.CharacterJumpForceDown();
+        GameManager.Instance.CharacterJumpForceDown();
         _statsPanelText.SetTheString();
         _crystalsAmountText.SetTheString();
     }
 
     public void ResetProgress()
     {
-        GameManager.instance.ResetProgress();
+        GameManager.Instance.ResetProgress();
         _statsPanelText.SetTheString();
         _crystalsAmountText.SetTheString();
     }

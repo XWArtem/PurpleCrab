@@ -1,18 +1,14 @@
 using UnityEngine;
 using UnityEngine.SceneManagement;
 
-/// <summary>
-/// That's the main script that controls core game logic
-/// </summary>
-
 public class GameManager : MonoBehaviour
 {
-    public static GameManager instance = null;
+    public static GameManager Instance { get; private set; }
+
     [SerializeField] private Player _player = null;
     [SerializeField] private InputController _inputController;
     [SerializeField] private UIManager _UIManager;
     [SerializeField] private CameraFollow _camera;
-    [SerializeField] private SoundManager _soundManager = null;
 
     private DataArchitecture.StatsRepository statsRepository;
     private DataArchitecture.StatsInteractor statsInteractor;
@@ -25,36 +21,36 @@ public class GameManager : MonoBehaviour
     public int Crystals;
     public int LevelProgress;
 
-
     private void Awake()
     {
-        if (instance == null) instance = this;
-        else if (instance == this) Destroy(gameObject);
-        DontDestroyOnLoad(gameObject);
+        if (Instance == null)
+        {
+            Instance = this;
+            //DontDestroyOnLoad(gameObject);
+        }
+        else Destroy(gameObject);
     }
 
     // instantly load the Undestroyable scene, find everything we need and go to the menu
     private void Start()
     {
-        this.statsRepository = new DataArchitecture.StatsRepository();
-        this.statsRepository.Initialize();
-        this.statsInteractor = new DataArchitecture.StatsInteractor(this.statsRepository);
+        statsRepository = new DataArchitecture.StatsRepository();
+        statsRepository.Initialize();
+        statsInteractor = new DataArchitecture.StatsInteractor(statsRepository);
 
-        CharacterMoveSpeed = this.statsInteractor.characterMoveSpeed;
-        CharacterJumpForce = this.statsInteractor.characterJumpForce;
-        Crystals = this.statsInteractor.crystals;
-        LevelProgress = this.statsInteractor.levelProgress;
+        CharacterMoveSpeed = statsInteractor.characterMoveSpeed;
+        CharacterJumpForce = statsInteractor.characterJumpForce;
+        Crystals = statsInteractor.crystals;
+        LevelProgress = statsInteractor.levelProgress;
 
         SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex + 1);
-        Debug.Log("Time Scale is" + Time.timeScale);
     }
 
-    // set all possible objects to the GameManager
+    // set all objects to the GameManager
     public void SetInputController(InputController c) { _inputController = c; }
     public void SetPlayer(Player p) { _player = p; }
     public void SetUIManager(UIManager ui) { _UIManager = ui; }
     public void SetCamera(CameraFollow cf) { _camera = cf; }
-    public void SetAudioManager(SoundManager sm) { _soundManager = sm; }
 
     private void Update()
     { 
@@ -66,7 +62,6 @@ public class GameManager : MonoBehaviour
     public void GameOver()
     {
         Debug.Log("Game Over!");
-        //gameObject.GetComponent<Player>().CharacterIsDead = true;
         _player.CharacterIsDead = true;
         UIManager.instance.ToggleDeathCanvas();
         // disable input controller and camera following
@@ -88,7 +83,7 @@ public class GameManager : MonoBehaviour
         if (levelIndex > LevelProgress)
         {
             LevelProgress++;
-            this.statsInteractor.LevelProgressUp();
+            statsInteractor.LevelProgressUp();
             AddCrystals(levelIndex-1);
             Debug.Log("Current LevelProgress is:" + LevelProgress);
             _UIManager.RenewLevelSelectCanvas();
@@ -108,6 +103,8 @@ public class GameManager : MonoBehaviour
         if (Time.timeScale == 0f) Time.timeScale = 1f;
         else Time.timeScale = 0f;
     }
+
+    // used by Restart Button in LevelCompletedCanvas :
     public void RestartLevel()
     {
         // full check first
@@ -115,24 +112,23 @@ public class GameManager : MonoBehaviour
         // reload the current level then
         SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex);
     }
-    /// ===== THIS SCRIPT WILL BE DELETED LATER (START)=====////
-    public void LoadCurrentLevel()
+
+
+    public void LoadLastOpenLevel()
     {
         // full check first
         if (LevelProgress <= 10)
         {
             FullCheckBeforeLoadLevel(LevelProgress + 1);
-            // load level 01 then
             SceneManager.LoadScene(LevelProgress + 1);
         }
         else
         {
             FullCheckBeforeLoadLevel(LevelProgress);
-            // load level 01 then
             SceneManager.LoadScene(LevelProgress);
         }
     }
-    /// ===== THIS SCRIPT WILL BE DELETED LATER (FINISH) =====////
+
     public void LoadNextLevel()
     {
         if (LevelProgress <= 10)
@@ -141,7 +137,6 @@ public class GameManager : MonoBehaviour
             FullCheckBeforeLoadLevel(SceneManager.GetActiveScene().buildIndex + 1);
             // load next then
             SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex + 1);
-            //_UIManager.RenewLevelSelectCanvas();
         }
         else
         {
@@ -158,8 +153,8 @@ public class GameManager : MonoBehaviour
         FullCheckBeforeLoadLevel(sceneIndex-1);
         // load the scene by name then
         SceneManager.LoadScene(sceneIndex);
-        
     }
+
     public void SelectLevel()
     {
         _UIManager.ToggleLevelSelectCanvas();
@@ -185,90 +180,106 @@ public class GameManager : MonoBehaviour
 
         // update the LevelProgress value in LevelCompletedCanvas
         _levelCompletedCanvas = GameObject.FindObjectOfType<LevelCompletedCanvas>();
-        Debug.Log("My GM has levelProgress now: " + LevelProgress);
 
-        // I need to check if the level is new to a Player and reward him crystals. If not, I should put 0 crystals in LevelCompletedCanvas
+        // I need to check if the level is new to a Player and reward him crystals.
+        // If not, we put 0 crystals in LevelCompletedCanvas
+        // make some Log outputs for easier understanding what's going on:
         Debug.Log("Level index is: " + levelIndex);
         Debug.Log("LevelProgress is: " + LevelProgress);
+
         if (levelIndex >= LevelProgress)
         {
+            // The Player passed the level first time! Award him
             _levelCompletedCanvas.UpdateLevelProgress(LevelProgress);
         }
         else
         {
+            // this level was already passed
             _levelCompletedCanvas.UpdateLevelProgress(0);
         }
     }
 
     private void AddCrystalsTest()
-    {
-        Debug.Log("Some crystals added");
+    { 
         this.statsInteractor.AddCrystals(this,160);
         Crystals = this.statsInteractor.crystals;
-        Debug.Log($"Currently I have, {this.statsInteractor.crystals} crystals in Interactor");
+        // make some Log outputs. If not needed, just comment them
+        Debug.Log($"Currently I have, {statsInteractor.crystals} crystals in Interactor");
         Debug.Log($"Currently I have, {Crystals} crystals in GM");
         Debug.Log($"My level progress is " + LevelProgress);
     }
-    // DELETE IT LATER -- START//
+    // TEST FUNCTION FOR ADDING 1 CRYSTAL -- START//
     public void AddOneCrystal()
     {
-        this.statsInteractor.AddCrystals(this, 1);
-        Crystals = this.statsInteractor.crystals;
+        statsInteractor.AddCrystals(this, 1);
+        Crystals = statsInteractor.crystals;
     }
-    // DELETE IT LATER -- FINISH//
+    // TEST FUNCTION FOR ADDING 1 CRYSTAL -- FINISH//
 
     public void AddCrystals(int value)
     {
-        this.statsInteractor.AddCrystals(this, value);
-        Crystals = this.statsInteractor.crystals;
+        statsInteractor.AddCrystals(this, value);
+        Crystals = statsInteractor.crystals;
     }
+
     public void CharacterMoveSpeedUp()
     {
-        if (this.statsInteractor.IsEnoughCrystals(10))
+        if (statsInteractor.IsEnoughCrystals(10))
         {
-            Debug.Log("I have " + this.statsInteractor.crystals + "crystals in Interactor before Spent 10 of them");
-            this.statsInteractor.SpendCrystals(this, 10);
-            Debug.Log("I have " + this.statsInteractor.crystals + "crystals in Interactor after Spent 10 of them");
-            this.statsInteractor.CharacterMoveSpeedUp(this, 1);
-            Debug.Log("Character Move Speed is" + this.statsInteractor.characterMoveSpeed);
+            Debug.Log("I have " + statsInteractor.crystals + 
+                "crystals in Interactor before Spent 10 of them");
 
-            // Renew the intern values to use it in StatsPanelText
-            CharacterMoveSpeed = this.statsInteractor.characterMoveSpeed;
-            Crystals = this.statsInteractor.crystals;
+            statsInteractor.SpendCrystals(this, 10);
+            Debug.Log("I have " + statsInteractor.crystals + 
+                "crystals in Interactor after Spent 10 of them");
+
+            statsInteractor.CharacterMoveSpeedUp(this, 1);
+            Debug.Log("Character Move Speed is" + statsInteractor.characterMoveSpeed);
+
+            // Refresh the intern values to use it in StatsPanelText
+            CharacterMoveSpeed = statsInteractor.characterMoveSpeed;
+            Crystals = statsInteractor.crystals;
         }
         else _UIManager.NotEnoughCrystals();
     }
 
     public void CharacterJumpForceUp()
     {
-        if (this.statsInteractor.IsEnoughCrystals(10))
+        if (statsInteractor.IsEnoughCrystals(10))
         {
-            Debug.Log("I have " + this.statsInteractor.crystals + "crystals in Interactor before Spent 10 of them");
-            this.statsInteractor.SpendCrystals(this, 10);
-            Debug.Log("I have " + this.statsInteractor.crystals + "crystals in Interactor after Spent 10 of them");
-            this.statsInteractor.CharacterJumpForceUp(this, 1);
-            Debug.Log("Character Jump Foce is" + this.statsInteractor.characterJumpForce);
+            Debug.Log("I have " + statsInteractor.crystals + 
+                "crystals in Interactor before Spent 10 of them");
+            statsInteractor.SpendCrystals(this, 10);
+            Debug.Log("I have " + statsInteractor.crystals + 
+                "crystals in Interactor after Spent 10 of them");
 
-            // Renew the intern values to use it in StatsPanelText
-            CharacterJumpForce = this.statsInteractor.characterJumpForce;
-            Crystals = this.statsInteractor.crystals;
+            statsInteractor.CharacterJumpForceUp(this, 1);
+            Debug.Log("Character Jump Foce is" + statsInteractor.characterJumpForce);
+
+            // Refresh the intern values to use it in StatsPanelText
+            CharacterJumpForce = statsInteractor.characterJumpForce;
+            Crystals = statsInteractor.crystals;
         }
         else _UIManager.NotEnoughCrystals();
     }
 
     public void CharacterMoveSpeedDown()
     {
-        if (this.statsInteractor.IsEnoughCharacterMoveSpeed(6))
+        if (statsInteractor.IsEnoughCharacterMoveSpeed(6))
         {
-            Debug.Log("I have " + this.statsInteractor.crystals + "crystals in Interactor before Spent 10 of them");
-            this.statsInteractor.AddCrystals(this, 10);
-            Debug.Log("I have " + this.statsInteractor.crystals + "crystals in Interactor after Spent 10 of them");
-            this.statsInteractor.CharacterMoveSpeedUp(this, -1);
-            Debug.Log("Character Move Speed is" + this.statsInteractor.characterMoveSpeed);
+            Debug.Log("I have " + statsInteractor.crystals + 
+                "crystals in Interactor before Spent 10 of them");
 
-            // Renew the intern values to use it in StatsPanelText
-            CharacterMoveSpeed = this.statsInteractor.characterMoveSpeed;
-            Crystals = this.statsInteractor.crystals;
+            statsInteractor.AddCrystals(this, 10);
+            Debug.Log("I have " + statsInteractor.crystals + 
+                "crystals in Interactor after Spent 10 of them");
+
+            statsInteractor.CharacterMoveSpeedUp(this, -1);
+            Debug.Log("Character Move Speed is" + statsInteractor.characterMoveSpeed);
+
+            // Refresh the intern values to use it in StatsPanelText
+            CharacterMoveSpeed = statsInteractor.characterMoveSpeed;
+            Crystals = statsInteractor.crystals;
         }
         else
         {
@@ -279,17 +290,19 @@ public class GameManager : MonoBehaviour
 
     public void CharacterJumpForceDown()
     {
-        if (this.statsInteractor.IsEnoughCharacterJumpForce(6))
+        if (statsInteractor.IsEnoughCharacterJumpForce(6))
         {
-            Debug.Log("I have " + this.statsInteractor.crystals + "crystals in Interactor before Spent 10 of them");
-            this.statsInteractor.AddCrystals(this, 10);
-            Debug.Log("I have " + this.statsInteractor.crystals + "crystals in Interactor after Spent 10 of them");
-            this.statsInteractor.CharacterJumpForceUp(this, -1);
-            Debug.Log("Character Jump Foce is" + this.statsInteractor.characterJumpForce);
+            Debug.Log("I have " + statsInteractor.crystals + 
+                "crystals in Interactor before Spent 10 of them");
+            statsInteractor.AddCrystals(this, 10);
+            Debug.Log("I have " + statsInteractor.crystals + 
+                "crystals in Interactor after Spent 10 of them");
+            statsInteractor.CharacterJumpForceUp(this, -1);
+            Debug.Log("Character Jump Foce is" + statsInteractor.characterJumpForce);
 
-            // Renew the intern values to use it in StatsPanelText
-            CharacterJumpForce = this.statsInteractor.characterJumpForce;
-            Crystals = this.statsInteractor.crystals;
+            // Refresh the intern values to use it in StatsPanelText
+            CharacterJumpForce = statsInteractor.characterJumpForce;
+            Crystals = statsInteractor.crystals;
         }
         else
         {
@@ -299,11 +312,11 @@ public class GameManager : MonoBehaviour
     }
     public void ResetProgress()
     {
-        this.statsInteractor.ResetAllStats();
-        Crystals = this.statsInteractor.crystals;
-        CharacterMoveSpeed = this.statsInteractor.characterMoveSpeed;
-        CharacterJumpForce = this.statsInteractor.characterJumpForce;
-        LevelProgress = this.statsInteractor.levelProgress;
+        statsInteractor.ResetAllStats();
+        Crystals = statsInteractor.crystals;
+        CharacterMoveSpeed = statsInteractor.characterMoveSpeed;
+        CharacterJumpForce = statsInteractor.characterJumpForce;
+        LevelProgress = statsInteractor.levelProgress;
         _UIManager.RenewLevelSelectCanvas();
     }
 }

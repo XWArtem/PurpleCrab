@@ -1,10 +1,9 @@
 using UnityEngine;
-
 public class Player : MonoBehaviour
 {
-    [SerializeField] private Rigidbody2D rb;
+    [SerializeField] private Rigidbody2D _rb;
     [SerializeField] private BoxCollider2D _boxCollider;
-    public InputController _inputController;
+    private InputController _inputController;
 
     // ===== MOVEMENT =====
     private float horizontalMove;
@@ -17,46 +16,42 @@ public class Player : MonoBehaviour
     [SerializeField] private bool isGrounded = false;
     [SerializeField] private bool WallOnRightSide = false;
     [SerializeField] private bool WallOnLeftSide = false;
-    public float rbVelocityY;
-    public float rbVelocityX;
 
     // ===== CHARACTER STATES =====
-    [SerializeField] private bool m_CharacterIsDead = false;
+    [SerializeField] private bool _CharacterIsDead = false;
     public bool CharacterIsDead
     {
-        get { return m_CharacterIsDead; }
-        set { m_CharacterIsDead = value; }
+        get { return _CharacterIsDead; }
+        set { _CharacterIsDead = value; }
     }
 
     public Animator animator;
 
     private void Awake()
     {
-        rb = GetComponent<Rigidbody2D>();
+        _rb = GetComponent<Rigidbody2D>();
         _boxCollider = GetComponent<BoxCollider2D>();
         _inputController = FindObjectOfType<InputController>();
     }
     private void Start()
     {
         // get the value of move speed and jump forse 
-        CharacterMoveSpeed = GameManager.instance.CharacterMoveSpeed;
-        CharacterJumpForce = GameManager.instance.CharacterJumpForce;
+        CharacterMoveSpeed = GameManager.Instance.CharacterMoveSpeed;
+        CharacterJumpForce = GameManager.Instance.CharacterJumpForce;
 
-        GameManager.instance.SetPlayer(this);
+        GameManager.Instance.SetPlayer(this);
     }
     private void Update()
     {
         HandleFinalMovement();
-        animator.SetFloat("HorizontalMove", Mathf.Abs(horizontalMove));
+        animator.SetFloat(CONSTSTRINGS.HorizontalMove, Mathf.Abs(horizontalMove));
+        
     }
 
     private void FixedUpdate()
     {
-        // check if the Character is Grounded or not
         CheckGround();
-        // check the walls on the right side of the Character
         CheckWallsRightSide();
-        // check the walls on the left side of the Character
         CheckWallsLeftSide();
     }
 
@@ -70,14 +65,17 @@ public class Player : MonoBehaviour
             rayColor = Color.green;
             else rayColor = Color.red;
         Debug.DrawRay(_boxCollider.bounds.center + 
-            new Vector3(_boxCollider.bounds.extents.x, 0), Vector2.down * (_boxCollider.bounds.extents.y + extraHeightText), rayColor);
+            new Vector3(_boxCollider.bounds.extents.x, 0),
+            Vector2.down * (_boxCollider.bounds.extents.y + extraHeightText), rayColor);
         
         Debug.DrawRay(_boxCollider.bounds.center -
-            new Vector3(_boxCollider.bounds.extents.x, 0), Vector2.down * (_boxCollider.bounds.extents.y + extraHeightText), rayColor);
+            new Vector3(_boxCollider.bounds.extents.x, 0),
+            Vector2.down * (_boxCollider.bounds.extents.y + extraHeightText), rayColor);
         
         Debug.DrawRay(_boxCollider.bounds.center -
-            new Vector3(_boxCollider.bounds.extents.x, _boxCollider.bounds.extents.y + extraHeightText), Vector2.right * (_boxCollider.bounds.extents.x*2), rayColor);
-        //Debug.Log(raycastHit.collider);
+            new Vector3(_boxCollider.bounds.extents.x, _boxCollider.bounds.extents.y + extraHeightText),
+            Vector2.right * (_boxCollider.bounds.extents.x*2), rayColor);
+
         isGrounded = (raycastHitBottom.collider != null) ? true : false;
     }
 
@@ -103,7 +101,7 @@ public class Player : MonoBehaviour
         }
         else
         {
-            verticalMove = rb.velocity.y;
+            verticalMove = _rb.velocity.y;
             if (WallOnRightSide)
                 horizontalMove = Mathf.Clamp(_inputController.MoveInput() * CharacterMoveSpeed, -8f, 0f);
             else if (WallOnLeftSide) 
@@ -111,9 +109,7 @@ public class Player : MonoBehaviour
             else 
                 horizontalMove = _inputController.MoveInput() * CharacterMoveSpeed;
         }
-        // Make the final calculations of Character movements
-        rb.velocity = new Vector2(horizontalMove, verticalMove);
-        rbVelocityY = rb.velocity.y;
-        rbVelocityX = rb.velocity.x;
+        // Final calculations
+        _rb.velocity = new Vector2(horizontalMove, verticalMove);
     }
 }

@@ -25,7 +25,7 @@ public class CrystalsAmountText : MonoBehaviour
     // Update is called once per frame
     public void SetTheString()
     {
-        _statsText.text = GameManager.instance.Crystals.ToString();
+        _statsText.text = GameManager.Instance.Crystals.ToString();
     }
     //public void Update()
     //{

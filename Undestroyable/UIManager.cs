@@ -14,11 +14,11 @@ public class UIManager : MonoBehaviour
     {
         if (instance == null) instance = this;
         else if (instance == this) Destroy(gameObject);
-        DontDestroyOnLoad(gameObject);
+        //DontDestroyOnLoad(gameObject);
     }
     private void Start()
     {
-        GameManager.instance.SetUIManager(this);
+        GameManager.Instance.SetUIManager(this);
 
         GameObject tempObjectDeathCanvas = GameObject.Find("DeathCanvas");
         if (tempObjectDeathCanvas != null)
@@ -87,7 +87,7 @@ public class UIManager : MonoBehaviour
     }
     public void BackToMenu()
     {
-        GameManager.instance.LoadMenu();
+        GameManager.Instance.LoadMenu();
     }
     public void NotEnoughCrystals()
     {

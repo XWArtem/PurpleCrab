@@ -7,10 +7,9 @@ public class InputController : MonoBehaviour
     public bool ControlEnabled = true;
     private void Start()
     {
-        GameManager.instance.SetInputController(this);
+        GameManager.Instance.SetInputController(this);
         if (instance == null) instance = this;
         else if (instance == this) Destroy(gameObject);
-        DontDestroyOnLoad(gameObject);
     }
     public bool LoadNextScene()
     {
