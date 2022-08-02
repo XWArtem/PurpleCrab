@@ -16,7 +16,6 @@ public class Logger : MonoBehaviour
         Application.logMessageReceived += OnLogMessageReceived;
         _fileWriter = new FileWriter(_workDirectory);
     }
-
     private void OnLogMessageReceived(string condition, string stackTrace, LogType type)
     {
         _fileWriter.Write(new LogMessageWriter(type, condition));

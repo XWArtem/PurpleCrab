@@ -4,13 +4,7 @@ using UnityEngine.UI;
 public class LevelSelectCanvas : MonoBehaviour
 {
     public Button[] levelButtons;
-        
-    public static LevelSelectCanvas instance;
-    private void Awake()
-    {
-        if (instance == null) instance = this;
-        else if (instance == this) Destroy(gameObject);
-    }
+
     private void Start()
     {
         RenewLevelSelectCanvas();

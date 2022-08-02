@@ -15,12 +15,10 @@ public class FileWriter
         _folder = folder;
         ManagePath();
     }
-
     private void ManagePath()
     {
         _filePath = $"{_folder}/{DateTime.UtcNow.ToString(DATE_FORMAT)}.log";
     }
-
     public void Write(LogMessageWriter message)
     {
         string messageToRecord = string.Format(MessageFormat, message.Time, message.Type, message.Message);

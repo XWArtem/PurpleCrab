@@ -1,0 +1,48 @@
+=====For Purple Crab=====
+
+=====Code Style documentation=====
+
+=====Version 1.0=====
+
+=====Created 01.08.2022=====
+
+1.private values start with '_' and lowerCase:
+private string _str;
+2. In case of abbreviations, upperCase is permitted:
+private string _UIstr;
+3. Public values start with UpperCase:
+public string Str;
+4. No \n between methods:
+private void Foo()
+{
+//something
+}
+private void Foo2()
+{
+//something else
+}
+5. \n between different logic parts inside a method are possible:
+private void Foo()
+{
+//something
+
+//something else
+}
+6. Make one \n after all 'using' directories:
+using System;
+
+public Class MyClass
+{
+// something
+}
+7. Classes' names always start with UpperCase:
+public Class MyClass
+{
+// something
+}
+8. If a value is Serializable, there must be no \n between [...] and access modifier:
+[SerializeField] private string _str;
+9. Operator 'if' in 'if-else' statements must always contain {}. But \n is optional in both:
+if (a==b) { return; }
+else Foo();
+

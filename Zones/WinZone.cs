@@ -11,6 +11,8 @@ public class WinZone : MonoBehaviour
     public void OnTriggerEnter2D(Collider2D collider)
     {
         if (collider.transform.tag == CONSTSTRINGS.Player)
+        {
             GameManager.Instance.LevelCompleted(sceneIndex);
+        }
     }
 }

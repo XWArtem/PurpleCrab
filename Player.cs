@@ -1,4 +1,5 @@
 using UnityEngine;
+
 public class Player : MonoBehaviour
 {
     [SerializeField] private Rigidbody2D _rb;
@@ -6,110 +7,113 @@ public class Player : MonoBehaviour
     private InputController _inputController;
 
     // ===== MOVEMENT =====
-    private float horizontalMove;
-    private float verticalMove;
-    [SerializeField] private float CharacterMoveSpeed = 8f;
-    [SerializeField] private float CharacterJumpForce = 8f;
-    private float extraHeightText = 0.05f;
-    private float extraWidthText = 0.05f;
-    [SerializeField] private LayerMask PlatformLayerMask;
-    [SerializeField] private bool isGrounded = false;
-    [SerializeField] private bool WallOnRightSide = false;
-    [SerializeField] private bool WallOnLeftSide = false;
+    private float _horizontalMove;
+    private float _verticalMove;
+    [SerializeField] private float _characterMoveSpeed = 8f;
+    [SerializeField] private float _characterJumpForce = 8f;
+
+    private readonly float _extraHeightOffset = 0.05f;
+    private readonly float _extraWidthOffset = 0.05f;
+
+    [SerializeField] private LayerMask _platformLayerMask;
+    [SerializeField] private bool _isGrounded = false;
+    [SerializeField] private bool _wallOnRightSide = false;
+    [SerializeField] private bool _wallOnLeftSide = false;
 
     // ===== CHARACTER STATES =====
-    [SerializeField] private bool _CharacterIsDead = false;
+    [SerializeField] private bool _characterIsDead = false;
     public bool CharacterIsDead
     {
-        get { return _CharacterIsDead; }
-        set { _CharacterIsDead = value; }
+        get { return _characterIsDead; }
+        set { _characterIsDead = value; }
     }
 
+    // ===== ANIMATOR =====
     public Animator animator;
 
     private void Awake()
     {
-        _rb = GetComponent<Rigidbody2D>();
+        _platformLayerMask = LayerMask.GetMask(CONSTSTRINGS.LayerMaskPlatforms);
+        _rb = gameObject.GetComponent<Rigidbody2D>();
         _boxCollider = GetComponent<BoxCollider2D>();
         _inputController = FindObjectOfType<InputController>();
     }
     private void Start()
     {
         // get the value of move speed and jump forse 
-        CharacterMoveSpeed = GameManager.Instance.CharacterMoveSpeed;
-        CharacterJumpForce = GameManager.Instance.CharacterJumpForce;
-
+        _characterMoveSpeed = GameManager.Instance.CharacterMoveSpeed;
+        _characterJumpForce = GameManager.Instance.CharacterJumpForce;
         GameManager.Instance.SetPlayer(this);
     }
     private void Update()
     {
-        HandleFinalMovement();
-        animator.SetFloat(CONSTSTRINGS.HorizontalMove, Mathf.Abs(horizontalMove));
-        
+        HandleMovement();
+        animator.SetFloat(CONSTSTRINGS.HorizontalMove, Mathf.Abs(_horizontalMove));
     }
-
     private void FixedUpdate()
     {
         CheckGround();
         CheckWallsRightSide();
         CheckWallsLeftSide();
     }
-
     private void CheckGround()
     {
         RaycastHit2D raycastHitBottom = Physics2D.BoxCast
-            (_boxCollider.bounds.center, _boxCollider.bounds.size, 0f, Vector2.down, extraHeightText, PlatformLayerMask);
-
+            (_boxCollider.bounds.center, _boxCollider.bounds.size, 0f, Vector2.down, _extraHeightOffset, _platformLayerMask);
         Color rayColor;
         if (raycastHitBottom.collider != null) 
-            rayColor = Color.green;
-            else rayColor = Color.red;
+        { 
+            rayColor = Color.green; 
+        }
+        else rayColor = Color.red;
+
         Debug.DrawRay(_boxCollider.bounds.center + 
             new Vector3(_boxCollider.bounds.extents.x, 0),
-            Vector2.down * (_boxCollider.bounds.extents.y + extraHeightText), rayColor);
+            Vector2.down * (_boxCollider.bounds.extents.y + _extraHeightOffset), rayColor);
         
         Debug.DrawRay(_boxCollider.bounds.center -
             new Vector3(_boxCollider.bounds.extents.x, 0),
-            Vector2.down * (_boxCollider.bounds.extents.y + extraHeightText), rayColor);
+            Vector2.down * (_boxCollider.bounds.extents.y + _extraHeightOffset), rayColor);
         
         Debug.DrawRay(_boxCollider.bounds.center -
-            new Vector3(_boxCollider.bounds.extents.x, _boxCollider.bounds.extents.y + extraHeightText),
+            new Vector3(_boxCollider.bounds.extents.x, _boxCollider.bounds.extents.y + _extraHeightOffset),
             Vector2.right * (_boxCollider.bounds.extents.x*2), rayColor);
 
-        isGrounded = (raycastHitBottom.collider != null) ? true : false;
+        _isGrounded = (raycastHitBottom.collider != null);
     }
-
     private void CheckWallsRightSide()
     {
         RaycastHit2D raycastHitRight = Physics2D.BoxCast
-            (_boxCollider.bounds.center, _boxCollider.bounds.size, 0f, Vector2.right, extraWidthText, PlatformLayerMask);
-        WallOnRightSide = (raycastHitRight.collider != null) ? true : false;
+            (_boxCollider.bounds.center, _boxCollider.bounds.size, 0f, Vector2.right, _extraWidthOffset, _platformLayerMask);
+        _wallOnRightSide = (raycastHitRight.collider != null);
     }
     private void CheckWallsLeftSide()
     {
         RaycastHit2D raycastHitLeft = Physics2D.BoxCast
-            (_boxCollider.bounds.center, _boxCollider.bounds.size, 0f, Vector2.left, extraWidthText, PlatformLayerMask);
-        WallOnLeftSide = (raycastHitLeft.collider != null) ? true : false;
+            (_boxCollider.bounds.center, _boxCollider.bounds.size, 0f, Vector2.left, _extraWidthOffset, _platformLayerMask);
+        _wallOnLeftSide = (raycastHitLeft.collider != null);
     }
-
-    private void HandleFinalMovement()
+    private void HandleMovement()
     {
-        if (isGrounded)
+        if (_isGrounded)
         {
-            horizontalMove = _inputController.MoveInput() * CharacterMoveSpeed;
-            verticalMove = _inputController.JumpInput() * CharacterJumpForce;
+            _horizontalMove = _inputController.MoveInput() * _characterMoveSpeed;
+            _verticalMove = _inputController.JumpInput() * _characterJumpForce;
         }
         else
         {
-            verticalMove = _rb.velocity.y;
-            if (WallOnRightSide)
-                horizontalMove = Mathf.Clamp(_inputController.MoveInput() * CharacterMoveSpeed, -8f, 0f);
-            else if (WallOnLeftSide) 
-                horizontalMove = Mathf.Clamp(_inputController.MoveInput() * CharacterMoveSpeed, 0f, 8f);
-            else 
-                horizontalMove = _inputController.MoveInput() * CharacterMoveSpeed;
+            _verticalMove = _rb.velocity.y;
+            if (_wallOnRightSide)
+            {
+                _horizontalMove = Mathf.Clamp(_inputController.MoveInput() * _characterMoveSpeed, -8f, 0f);
+            }
+            else if (_wallOnLeftSide)
+            {
+                _horizontalMove = Mathf.Clamp(_inputController.MoveInput() * _characterMoveSpeed, 0f, 8f);
+            }
+            else _horizontalMove = _inputController.MoveInput() * _characterMoveSpeed;
         }
         // Final calculations
-        _rb.velocity = new Vector2(horizontalMove, verticalMove);
+        _rb.velocity = new Vector2(_horizontalMove, _verticalMove);
     }
 }

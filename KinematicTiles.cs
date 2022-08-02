@@ -3,28 +3,23 @@ using System.Collections;
 
 public class KinematicTiles : MonoBehaviour
 {
-    [SerializeField] private float Xdirection = 1.0f;
-    [SerializeField] private float XdirectionSpeed = 0.4f;
-    [SerializeField] private float timeToChangeDirection = 3.0f;
-    [SerializeField] private Rigidbody2D rb;
+    [SerializeField] private float _Xdirection = 1.0f;
+    [SerializeField] private float _speed = 0.4f;
+    [SerializeField] private float _timeToChangeDirection = 3.0f;
+    private Rigidbody2D _rb;
 
     private void Start()
     {
-        StartCoroutine ("ChangeDirection", timeToChangeDirection);
-        rb = GetComponent<Rigidbody2D>();
+        _rb = gameObject.GetComponent<Rigidbody2D>();
+        TileBase _tileBase = new TileBase(_timeToChangeDirection, _Xdirection, 0f, _speed,_rb);
+        StartCoroutine(nameof(ChangeDirection), _timeToChangeDirection);
     }
-    private void Update()
-    {
-        rb.velocity = new Vector2(Xdirection* XdirectionSpeed, 0f);
-        //rb.AddForce(new Vector2(XdirectionSpeed* Xdirection, 0f), ForceMode2D.Force);
-        //transform.position += transform.right * XdirectionSpeed * Time.deltaTime * Xdirection;
-    }
-    IEnumerator ChangeDirection()
+    public IEnumerator ChangeDirection()
     {
         while (true)
         {
-            yield return new WaitForSeconds(timeToChangeDirection);
-            Xdirection *= -1;
+            yield return new WaitForSeconds(_timeToChangeDirection);
+            _Xdirection *= -1;
         }
     }
 }

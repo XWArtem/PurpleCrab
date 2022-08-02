@@ -1,25 +1,16 @@
 using UnityEngine;
 
-/// <summary>
-/// Mainly MainMenu interacts with GameManager and launch its methods. Also it runs some UI features
-/// </summary>
-
 public class MainMenu : MonoBehaviour
 {
     [SerializeField] private StatsPanelText _statsPanelText;
     [SerializeField] private CrystalsAmountText _crystalsAmountText;
-    [SerializeField] private GameObject _settingsPanel = null;
+    [SerializeField] private GameObject _settingsPanel;
     [SerializeField] private SoundManager _soundManager = null;
 
     private void Start()
     {
-        if (_settingsPanel == null)
-        {
-            _settingsPanel = GameObject.Find("SettingsPanel");
-        }
-        _settingsPanel.SetActive(false);
+        _settingsPanel?.SetActive(false);
     }
-
     // used by PLAY button in the main menu
     public void LoadLastOpenLevel()
     {
@@ -57,7 +48,6 @@ public class MainMenu : MonoBehaviour
         _statsPanelText.SetTheString();
         _crystalsAmountText.SetTheString();
     }
-
     public void ResetProgress()
     {
         GameManager.Instance.ResetProgress();
@@ -72,7 +62,6 @@ public class MainMenu : MonoBehaviour
     {
         _settingsPanel.SetActive(false);
     }
-
     public void SetMusicVolume(float musicVolume)
     {
         if (_soundManager == null)
