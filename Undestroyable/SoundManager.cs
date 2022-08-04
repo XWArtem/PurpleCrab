@@ -1,17 +1,11 @@
 using UnityEngine;
-/// <summary>
-/// handles background music and other sounds if any appear later
-/// </summary>
 
 public class SoundManager : MonoBehaviour
 {
-    [SerializeField] 
-    [Header ("Audio tracks")]
-    [Tooltip ("Add new audio track here")]
+    [SerializeField] [Header ("Audio tracks")] [Tooltip ("Add new audio track here")]
     private AudioClip[] _audioClip;
 
-    [SerializeField]
-    private AudioSource _audioSource;
+    [SerializeField] private AudioSource _audioSource;
     private void Awake()
     {
         if (_audioClip[0] != null)
@@ -23,25 +17,25 @@ public class SoundManager : MonoBehaviour
     private void Start()
     {
         // the first track lasts 208 sec
-        Invoke("SwitchTheMusic", 208f);
-        _audioSource.volume = 0.03f;
+        Invoke(nameof(SwitchTheMusic), 208f);
+        _audioSource.volume = 0.0f;
     }
 
-    private void  SwitchTheMusic ()
+    private void  SwitchTheMusic()
     {
         if (_audioClip[1] != null && _audioSource.clip == _audioClip[0])
         {
             _audioSource.clip = _audioClip[1];
             _audioSource.Play();
             // the second track lasts 279 sec
-            Invoke("SwitchTheMusic", 279f);
+            Invoke(nameof(SwitchTheMusic), 279f);
         }
         else if (_audioClip[0] != null && _audioSource.clip == _audioClip[1])
         {
             _audioSource.clip = _audioClip[0];
             _audioSource.Play();
             // the first track lasts 208 sec
-            Invoke("SwitchTheMusic", 208f);
+            Invoke(nameof(SwitchTheMusic), 208f);
         }
     }
 

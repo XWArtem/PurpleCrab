@@ -43,7 +43,7 @@ public class Player : MonoBehaviour
         // get the value of move speed and jump forse 
         _characterMoveSpeed = GameManager.Instance.CharacterMoveSpeed;
         _characterJumpForce = GameManager.Instance.CharacterJumpForce;
-        GameManager.Instance.SetPlayer(this);
+        //GameManager.Instance.SetPlayer(this); ”¡–¿“‹
     }
     private void Update()
     {
