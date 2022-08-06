@@ -1,7 +1,10 @@
 using UnityEngine;
+using System;
 
 public class UIManager : MonoBehaviour
 {
+    public static Action<bool> BackgroundFadeAction;
+
     public static UIManager instance;
     public Canvas DeathCanvas;
     public Canvas PauseCanvas = null;
@@ -45,6 +48,7 @@ public class UIManager : MonoBehaviour
     public void ToggleLevelSelectCanvas()
     {
         LevelSelectCanvas.enabled = !LevelSelectCanvas.enabled;
+        BackgroundFadeAction?.Invoke(!LevelSelectCanvas.enabled);
     }
     public void RenewLevelSelectCanvas()
     {
@@ -56,7 +60,10 @@ public class UIManager : MonoBehaviour
     }
     public void NotEnoughCrystals()
     {
-        _crystalsAmountText = GameObject.Find("CrystalsAmount").GetComponent<CrystalsAmountText>();
+        if (_crystalsAmountText == null)
+        {
+            _crystalsAmountText = FindObjectOfType<CrystalsAmountText>();
+        }
         _crystalsAmountText.RedString();
     }
 }

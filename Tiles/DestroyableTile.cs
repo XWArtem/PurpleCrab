@@ -1,6 +1,6 @@
 using UnityEngine;
 
-public class Destroyabletile : MonoBehaviour
+public class DestroyableTile : MonoBehaviour
 {
     [SerializeField] private float _timeToFall = 0.1f;
     [SerializeField] private Rigidbody2D _rb;

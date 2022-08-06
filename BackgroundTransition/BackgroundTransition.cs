@@ -1,5 +1,3 @@
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 
 public class BackgroundTransition : MonoBehaviour
@@ -20,6 +18,6 @@ public class BackgroundTransition : MonoBehaviour
     {
         Vector3 deltaSpace = _target.position - targetPosition;
         targetPosition = _target.position;
-        transform.position += deltaSpace * _parallaxForce;
+        transform.position += new Vector3(deltaSpace.x * _parallaxForce, 0, 0);
     }
 }
