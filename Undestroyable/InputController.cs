@@ -7,14 +7,20 @@ public class InputController : MonoBehaviour
     {
         GameManager.Instance.SetInputController(this);
     }
-    public bool LoadNextScene()
-    {
-        if (ControlEnabled)
-        {
-            return Input.GetKey(KeyCode.F1);
-        }
-        else return false;
-    }
+
+    // ===== DEV MODE. START
+
+    //public bool LoadNextScene()
+    //{
+    //    if (ControlEnabled)
+    //    {
+    //        return Input.GetKey(KeyCode.F1);
+    //    }
+    //    else return false;
+    //}
+
+    // ===== DEV MODE. END
+
     public float MoveInput()
     {
         if (ControlEnabled)

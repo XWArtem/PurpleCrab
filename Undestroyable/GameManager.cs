@@ -72,7 +72,8 @@ public class GameManager : MonoBehaviour
     public void SetStatsPanelText(StatsPanelText statsPanelText) { _statsPanelText = statsPanelText; }
     private void Update()
     {
-        if (_inputController.LoadNextScene()) { LoadNextLevel(); }
+        // ===== DEV MODE ONLY:
+        //if (_inputController.LoadNextScene()) { LoadNextLevel(); }
         if (_inputController.PauseGameInput()) { PauseGame(); }
         if (_inputController.AddCrystalsInput()) { AddCrystalsTest(); }
     }
@@ -87,9 +88,6 @@ public class GameManager : MonoBehaviour
     }
     public void LevelCompleted(int levelIndex)
     {
-        Debug.Log("Level completed!");
-        Debug.Log("Scene Index is :" + levelIndex);
-        // disable input controller and camera following
         _inputController.ControlEnabled = false;
         _cameraFollow.CameraIsActive = false;
         if (Time.timeScale != 0f) { Time.timeScale = 0f; }
@@ -142,15 +140,15 @@ public class GameManager : MonoBehaviour
     }
     public void LoadNextLevel()
     {
-        if (LevelProgress <= 10)
-        {
-            FullCheckBeforeLoadLevel(SceneManager.GetActiveScene().buildIndex + 1);
-            SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex + 1);
-        }
-        else
+        if (SceneManager.GetActiveScene().buildIndex >= 11) // reached the last level
         {
             FullCheckBeforeLoadLevel(SceneManager.GetActiveScene().buildIndex);
             SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex);
+        }
+        else
+        {
+            FullCheckBeforeLoadLevel(SceneManager.GetActiveScene().buildIndex + 1);
+            SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex + 1);
         }
     }
     // loading scene from LevelSelect Canvas:
@@ -199,13 +197,21 @@ public class GameManager : MonoBehaviour
 
         if (levelIndex >= LevelProgress)
         {
-            // The Player passed the level first time! Award him in the end
+            // The Player is going to pass the level first time! Award him in the end
             _levelCompletedCanvas.UpdateLevelProgress(LevelProgress);
         }
         else
         {
             // this level was already passed
             _levelCompletedCanvas.UpdateLevelProgress(0);
+        }
+        if (levelIndex == 10)
+        {
+            _levelCompletedCanvas.DisableNextLevelButton(false);
+        }
+        else
+        {
+            _levelCompletedCanvas.DisableNextLevelButton(true);
         }
     }
     private void AddCrystalsTest()

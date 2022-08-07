@@ -62,12 +62,4 @@ public class MainMenu : MonoBehaviour
     {
         _settingsPanel.SetActive(false);
     }
-    public void SetMusicVolume(float musicVolume)
-    {
-        if (_soundManager == null)
-        {
-            _soundManager = FindObjectOfType<SoundManager>();
-        }
-        _soundManager.SetMusicVolume(musicVolume);
-    }
 }
