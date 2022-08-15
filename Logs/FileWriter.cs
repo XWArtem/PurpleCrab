@@ -6,7 +6,7 @@ public class FileWriter
 {
     private string _folder;
     private string _filePath;
-
+    
     private const string DATE_FORMAT = "yyyy-MM-dd";
     private const string MessageFormat = "{0:dd/MM/yyyy HH:mm:ss:ffff} [{1}]: {2}\r";
 

@@ -1,5 +1,4 @@
 using UnityEngine;
-using UnityEngine.SceneManagement;
 
 public class GameManager : MonoBehaviour
 {
@@ -10,6 +9,7 @@ public class GameManager : MonoBehaviour
     [SerializeField] private UIManager _UIManager;
     [SerializeField] private CameraFollow _cameraFollow;
     [SerializeField] private MainHeroSpawner _mainHeroSpawner;
+    [SerializeField] private TimeFlow _timeFlow;
 
     private DataArchitecture.StatsRepository _statsRepository;
     private DataArchitecture.StatsInteractor _statsInteractor;
@@ -40,13 +40,9 @@ public class GameManager : MonoBehaviour
 
     private void Awake()
     {
-        
         if (Instance == null) { Instance = this; }
         else Destroy(gameObject);
-    }
-    // instantly load the Undestroyable scene, find everything we need and go to the menu
-    private void Start()
-    {
+
         _statsRepository = new DataArchitecture.StatsRepository();
         _statsRepository.Initialize();
         _statsInteractor = new DataArchitecture.StatsInteractor(_statsRepository);
@@ -55,13 +51,9 @@ public class GameManager : MonoBehaviour
         CharacterJumpForce = _statsInteractor.CharacterJumpForce;
         Crystals = _statsInteractor.Crystals;
         LevelProgress = _statsInteractor.LevelProgress;
-        
-        SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex + 1);
     }
 
-    // set all objects to the GameManager
     public void SetInputController(InputController inputController) { _inputController = inputController; }
-    //public void SetPlayer(Player player) { _player = player; } ”¡–¿“‹
     public void SetUIManager(UIManager UImanager) { _UIManager = UImanager; }
     public void SetCamera(CameraFollow cameraFollow) { _cameraFollow = cameraFollow; }
     public void SetCrystalsAmountText(CrystalsAmountText crystalsAmountText) 
@@ -74,23 +66,34 @@ public class GameManager : MonoBehaviour
     {
         // ===== DEV MODE ONLY:
         //if (_inputController.LoadNextScene()) { LoadNextLevel(); }
+        //if (_inputController.AddCrystalsInputTest()) { AddCrystalsTest(); }
+
         if (_inputController.PauseGameInput()) { PauseGame(); }
-        if (_inputController.AddCrystalsInput()) { AddCrystalsTest(); }
     }
+    // ===== DEV MODE ONLY:
+    //private void AddCrystalsTest()
+    //{
+    //    _statsInteractor.AddCrystals(this, 160);
+    //    Crystals = _statsInteractor.Crystals;
+    //}
+    //public void AddOneCrystal()
+    //{
+    //    _statsInteractor.AddCrystals(this, 1);
+    //    Crystals = _statsInteractor.Crystals;
+    //}
     public void GameOver()
     {
-        Debug.Log("Game Over!");
-        _player.CharacterIsDead = true;
+        StaticActions.TogglePlayerIsDeadAction?.Invoke(true);
         UIManager.instance.ToggleDeathCanvas();
         // disable input controller and camera following
-        _inputController.ControlEnabled = false;
-        _cameraFollow.CameraIsActive = false;
+        StaticActions.ToggleInputControllerAction?.Invoke(false);
+        StaticActions.SetCameraActiveAction?.Invoke(false);
     }
     public void LevelCompleted(int levelIndex)
     {
-        _inputController.ControlEnabled = false;
-        _cameraFollow.CameraIsActive = false;
-        if (Time.timeScale != 0f) { Time.timeScale = 0f; }
+        StaticActions.ToggleInputControllerAction?.Invoke(false);
+        StaticActions.SetCameraActiveAction?.Invoke(false);
+        _timeFlow.SetTimeScale(0);
         _UIManager.ToggleLevelCompletedCanvas();
 
         // add LevelProgress if this LEVEL is completed the FIRST TIME
@@ -98,20 +101,10 @@ public class GameManager : MonoBehaviour
         {
             LevelProgress++;
             _statsInteractor.LevelProgressUp();
-            AddCrystals(levelIndex-1);
+            AddCrystals(levelIndex - 1);
             Debug.Log("Current LevelProgress is:" + LevelProgress);
             _UIManager.RenewLevelSelectCanvas();
         }
-    }
-    public void LoadMenu()
-    {
-        SceneManager.LoadScene("Menu");
-        if (_UIManager.LevelSelectCanvas.enabled == true) 
-        { 
-            _UIManager.LevelSelectCanvas.enabled = false; 
-        }
-        _UIManager.ToggleUIGameBackground(false);
-        if (Time.timeScale == 0) { Time.timeScale = 1; }
     }
     public void PauseGame()
     {
@@ -119,113 +112,10 @@ public class GameManager : MonoBehaviour
         if (Time.timeScale == 0f) { Time.timeScale = 1f; }
         else Time.timeScale = 0f;
     }
-    // used by Restart Button in LevelCompletedCanvas :
-    public void RestartLevel()
-    {
-        FullCheckBeforeLoadLevel(SceneManager.GetActiveScene().buildIndex - 1);
-        SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex);
-    }
-    public void LoadLastOpenLevel()
-    {
-        if (LevelProgress <= 10)
-        {
-            FullCheckBeforeLoadLevel(LevelProgress + 1);
-            SceneManager.LoadScene(LevelProgress + 1);
-        }
-        else
-        {
-            FullCheckBeforeLoadLevel(LevelProgress);
-            SceneManager.LoadScene(LevelProgress);
-        }
-    }
-    public void LoadNextLevel()
-    {
-        if (SceneManager.GetActiveScene().buildIndex >= 11) // reached the last level
-        {
-            FullCheckBeforeLoadLevel(SceneManager.GetActiveScene().buildIndex);
-            SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex);
-        }
-        else
-        {
-            FullCheckBeforeLoadLevel(SceneManager.GetActiveScene().buildIndex + 1);
-            SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex + 1);
-        }
-    }
-    // loading scene from LevelSelect Canvas:
-    public void LoadSceneOnName(int sceneIndex)
-    {
-        FullCheckBeforeLoadLevel(sceneIndex-1);
-        SceneManager.LoadScene(sceneIndex);
-    }
     public void SelectLevel()
     {
         _UIManager.ToggleLevelSelectCanvas();
     }
-    private void FullCheckBeforeLoadLevel(int levelIndex)
-    {
-        // disable all Canvases if active
-        if (_UIManager.PauseCanvas.enabled) _UIManager.PauseCanvas.enabled = false;
-        if (_UIManager.DeathCanvas.enabled) _UIManager.DeathCanvas.enabled = false;
-        if (_UIManager.LevelCompletedCanvas.enabled) _UIManager.LevelCompletedCanvas.enabled = false;
-        if (_UIManager.LevelSelectCanvas.enabled) _UIManager.LevelSelectCanvas.enabled = false;
-
-        
-        // enable in-game Canvas background
-        _UIManager.ToggleUIGameBackground(true);
-
-        // reset the values about Character death and input controller
-        _inputController.ControlEnabled = true;
-        if (_player != null) 
-        {
-            _player.CharacterIsDead = false; 
-        }
-        // enable camera
-        if (_cameraFollow != null)
-        {
-            _cameraFollow.CameraIsActive = true;
-        }
-        // start Timer
-        if (Time.timeScale == 0f)
-        {
-            Time.timeScale = 1f;
-        }
-        // update the LevelProgress value in LevelCompletedCanvas
-        _levelCompletedCanvas = GameObject.FindObjectOfType<LevelCompletedCanvas>();
-
-        // I need to check if the level is new to a Player and reward him crystals.
-        // If not, we put 0 crystals in LevelCompletedCanvas
-
-        if (levelIndex >= LevelProgress)
-        {
-            // The Player is going to pass the level first time! Award him in the end
-            _levelCompletedCanvas.UpdateLevelProgress(LevelProgress);
-        }
-        else
-        {
-            // this level was already passed
-            _levelCompletedCanvas.UpdateLevelProgress(0);
-        }
-        if (levelIndex == 10)
-        {
-            _levelCompletedCanvas.DisableNextLevelButton(false);
-        }
-        else
-        {
-            _levelCompletedCanvas.DisableNextLevelButton(true);
-        }
-    }
-    private void AddCrystalsTest()
-    { 
-        _statsInteractor.AddCrystals(this,160);
-        Crystals = _statsInteractor.Crystals;
-    }
-    // TEST FUNCTION FOR ADDING 1 CRYSTAL -- START//
-    public void AddOneCrystal()
-    {
-        _statsInteractor.AddCrystals(this, 1);
-        Crystals = _statsInteractor.Crystals;
-    }
-    // TEST FUNCTION FOR ADDING 1 CRYSTAL -- FINISH//
     public void AddCrystals(int value)
     {
         _statsInteractor.AddCrystals(this, value);

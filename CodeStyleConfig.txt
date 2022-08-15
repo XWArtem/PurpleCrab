@@ -44,5 +44,14 @@ public Class MyClass
 [SerializeField] private string _str;
 9. Operator 'if' in 'if-else' statements must always contain {}. But \n is optional in both:
 if (a==b) { return; }
-else Foo();
-
+else 
+{ 
+Foo(); 
+}
+10. '{' is better to be placed on the next line:
+private void Foo()
+{
+//
+}
+11. If something is private, put it down:
+private float _health;

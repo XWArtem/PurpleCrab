@@ -22,11 +22,6 @@ public class Player : MonoBehaviour
 
     // ===== CHARACTER STATES =====
     [SerializeField] private bool _characterIsDead = false;
-    public bool CharacterIsDead
-    {
-        get { return _characterIsDead; }
-        set { _characterIsDead = value; }
-    }
 
     // ===== ANIMATOR =====
     public Animator animator;
@@ -43,6 +38,14 @@ public class Player : MonoBehaviour
         _characterMoveSpeed = GameManager.Instance.CharacterMoveSpeed;
         _characterJumpForce = GameManager.Instance.CharacterJumpForce;
     }
+    private void OnEnable()
+    {
+        StaticActions.TogglePlayerIsDeadAction += ToggleCharacterIsDead;
+    }
+    private void OnDisable()
+    {
+        StaticActions.TogglePlayerIsDeadAction -= ToggleCharacterIsDead;
+    }
     private void Update()
     {
         HandleMovement();
@@ -53,6 +56,10 @@ public class Player : MonoBehaviour
         CheckGround();
         CheckWallsRightSide();
         CheckWallsLeftSide();
+    }
+    private void ToggleCharacterIsDead(bool isDead)
+    {
+        _characterIsDead = isDead;
     }
     private void CheckGround()
     {

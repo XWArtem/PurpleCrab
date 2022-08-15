@@ -11,7 +11,7 @@ public class LevelSelectCanvas : MonoBehaviour
     }
     public void SelectLevel (int sceneIndex)
     {
-        GameManager.Instance.LoadSceneOnName(sceneIndex);
+        StaticActions.LoadSceneOnNameAction?.Invoke(sceneIndex);
     }
     public void RenewLevelSelectCanvas()
     {

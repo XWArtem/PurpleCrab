@@ -10,17 +10,7 @@ public class CameraFollow : MonoBehaviour
 
     private bool _cameraIsActive = true;
     [SerializeField] private float _smoothSpeed = 0.2f;
-    public bool CameraIsActive 
-    {
-        private get
-        {
-            return _cameraIsActive;
-        }
-        set
-        {
-            _cameraIsActive = value;
-        }
-    }
+
     private void Start()
     {
         GameManager.Instance.SetCamera(this);
@@ -28,10 +18,16 @@ public class CameraFollow : MonoBehaviour
     private void OnEnable()
     {
         MainHeroSpawner.FindTargetAction += FindTarget;
+        StaticActions.SetCameraActiveAction += SetCameraActive;
     }
     private void OnDisable()
     {
         MainHeroSpawner.FindTargetAction -= FindTarget;
+        StaticActions.SetCameraActiveAction -= SetCameraActive;
+    }
+    private void SetCameraActive(bool isActive)
+    {
+        _cameraIsActive = isActive;
     }
     void FixedUpdate()
     {

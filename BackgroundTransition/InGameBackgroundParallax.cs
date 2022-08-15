@@ -1,6 +1,6 @@
 using UnityEngine;
 
-public class BackgroundTransition : MonoBehaviour
+public class InGameBackgroundParallax : MonoBehaviour
 {
     [SerializeField] private Transform _target;
     [SerializeField, Range(0f, 1f)] private float _parallaxForce;
@@ -12,7 +12,6 @@ public class BackgroundTransition : MonoBehaviour
         {
             throw new System.Exception($"Target is missing for {gameObject}");
         }
-        targetPosition = _target.position; // delete this?
     }
     private void Update()
     {

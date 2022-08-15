@@ -14,7 +14,7 @@ public class MainMenu : MonoBehaviour
     // used by PLAY button in the main menu
     public void LoadLastOpenLevel()
     {
-        GameManager.Instance.LoadLastOpenLevel();
+        StaticActions.LoadLastLevelAction?.Invoke();
     }
     public void SelectLevel()
     {

@@ -7,11 +7,11 @@ public class UIManager : MonoBehaviour
 
     public static UIManager instance;
     public Canvas DeathCanvas;
-    public Canvas PauseCanvas = null;
-    public Canvas LevelCompletedCanvas = null;
-    public Canvas LevelSelectCanvas = null;
-    public LevelSelectCanvas _levelSelectCanvas = null;
-    public CrystalsAmountText _crystalsAmountText = null;
+    public Canvas PauseCanvas;
+    public Canvas LevelCompletedCanvas;
+    public Canvas LevelSelectCanvas;
+    public LevelSelectCanvas _levelSelectCanvas;
+    public CrystalsAmountText _crystalsAmountText;
     [SerializeField] private Canvas UIGameBackground;
 
     private void Awake()
@@ -53,10 +53,6 @@ public class UIManager : MonoBehaviour
     public void RenewLevelSelectCanvas()
     {
         _levelSelectCanvas.RenewLevelSelectCanvas();
-    }
-    public void BackToMenu()
-    {
-        GameManager.Instance.LoadMenu();
     }
     public void NotEnoughCrystals()
     {

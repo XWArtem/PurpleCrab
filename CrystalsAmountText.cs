@@ -40,7 +40,7 @@ public class CrystalsAmountText : MonoBehaviour
     public void RedString()
     {
         _statsText.color = _redColor;
-        Invoke ("ColorChangeBack", 1);
+        Invoke (nameof(ColorChangeBack), 1);
     }
     private void ColorChangeBack ()
     {

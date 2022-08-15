@@ -2,12 +2,19 @@ using UnityEngine;
 
 public class InputController : MonoBehaviour
 {
-    public bool ControlEnabled = true;
+    private bool ControlEnabled = true;
     private void Start()
     {
         GameManager.Instance.SetInputController(this);
     }
-
+    private void OnEnable()
+    {
+        StaticActions.ToggleInputControllerAction += ToggleInputController;
+    }
+    private void OnDisable()
+    {
+        StaticActions.ToggleInputControllerAction -= ToggleInputController;
+    }
     // ===== DEV MODE. START
 
     //public bool LoadNextScene()
@@ -18,9 +25,15 @@ public class InputController : MonoBehaviour
     //    }
     //    else return false;
     //}
-
+    //public bool AddCrystalsInputTest()
+    //{
+    //    return Input.GetKeyDown(KeyCode.F2);
+    //}
     // ===== DEV MODE. END
-
+    private void ToggleInputController(bool setEnabled)
+    {
+        ControlEnabled = setEnabled;
+    }
     public float MoveInput()
     {
         if (ControlEnabled)
@@ -40,9 +53,5 @@ public class InputController : MonoBehaviour
     public bool PauseGameInput()
     {
         return Input.GetKeyDown(KeyCode.Escape);
-    }
-    public bool AddCrystalsInput()
-    {
-        return Input.GetKeyDown(KeyCode.F2);
     }
 }

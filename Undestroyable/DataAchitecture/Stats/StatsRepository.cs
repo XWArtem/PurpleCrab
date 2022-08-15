@@ -29,7 +29,6 @@ namespace DataArchitecture
         }
         public override void Save()
         {
-            
             PlayerPrefs.SetInt(KEY_CRYSTALS, Crystals);
             PlayerPrefs.SetInt(KEY_LEVEL_PROGRESS, LevelProgress);
             PlayerPrefs.SetFloat(KEY_CHARACTERMOVESPEED, CharacterMoveSpeed);
