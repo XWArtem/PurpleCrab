@@ -1,9 +1,7 @@
-# PurpleCrab
-Game Purple Crab 1.01
-What's new:
-- Player script optimized
-- script ConstStrings added
-- Log Writer added
-- Death Canvas and Pause Canvas scripts simplified to nothing. Deleted
-- DontDestroyOnLoad released apart in another script
-- EventSystem script deleted
+# PurpleCrab v1.1
+
+Plain Platformer game for PC<br>
+Made with Unity
+<hr>
+
+![](https://github.com/XWArtem/PurpleCrab/blob/main/PurpleCrabGif_04.gif)
